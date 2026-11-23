@@ -9,8 +9,7 @@ const PORT = process.env.PORT || 3000;
 store
   .init()
   .then(() => {
-    const mode = process.env.DATABASE_URL ? 'PostgreSQL' : 'mémoire';
-    app.listen(PORT, () => console.log(`API démarrée sur http://localhost:${PORT} (stockage : ${mode})`));
+    app.listen(PORT, () => console.log(`API démarrée sur le port ${PORT} (stockage : ${store.mode})`));
   })
   .catch((err) => {
     console.error('Impossible de préparer le stockage :', err.message);

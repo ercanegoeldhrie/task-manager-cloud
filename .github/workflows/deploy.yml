@@ -1,6 +1,6 @@
 # CD = Déploiement Continu.
-# Quand du code arrive sur "main" ET que les tests passent, on construit l'image Docker
-# et on l'envoie dans le registre AWS ECR. À l'étape 6, ce même workflow déploiera l'app.
+# Quand du code arrive sur "main" ET que les tests passent, on construit l'image Docker,
+# on l'envoie dans le registre AWS ECR, puis on demande à ECS de relancer l'app avec elle.
 #
 # Connexion à AWS SANS AUCUNE CLÉ grâce à OIDC :
 # GitHub fournit un "jeton d'identité" signé qui prouve « je suis le workflow du dépôt X,
@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   push-image:
-    name: Envoyer l'image vers ECR
+    name: Envoyer l'image et redéployer
     runs-on: ubuntu-latest
     # On ne déploie que si :
     #  - la CI a réussi (ou lancement manuel),
@@ -33,6 +33,8 @@ jobs:
     env:
       AWS_REGION: eu-west-3
       ECR_REPOSITORY: task-manager-api
+      ECS_CLUSTER: task-manager
+      ECS_SERVICE: task-manager-api
     steps:
       - uses: actions/checkout@v5
         with:
@@ -59,3 +61,18 @@ jobs:
           docker push "$REGISTRY/$ECR_REPOSITORY:$TAG"
           docker push "$REGISTRY/$ECR_REPOSITORY:latest"
           echo "Image envoyée : $REGISTRY/$ECR_REPOSITORY:$TAG" >> "$GITHUB_STEP_SUMMARY"
+
+      # Étape 6 : si le service existe, on le relance pour qu'il prenne l'image ":latest".
+      # ECS démarre le nouveau conteneur, vérifie /health, puis seulement arrête l'ancien :
+      # c'est un déploiement SANS COUPURE ("rolling update").
+      - name: Redéployer le service ECS
+        run: |
+          status=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" \
+            --query 'services[0].status' --output text 2>/dev/null || echo NONE)
+          if [ "$status" = "ACTIVE" ]; then
+            aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" \
+              --force-new-deployment --query 'service.serviceName' --output text
+            echo "Redéploiement lancé sur ECS." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Service ECS pas encore créé (deploy_app = false) : image envoyée seulement." >> "$GITHUB_STEP_SUMMARY"
+          fi

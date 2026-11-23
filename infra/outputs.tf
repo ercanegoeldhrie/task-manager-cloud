@@ -19,3 +19,13 @@ output "github_deploy_role_arn" {
   description = "Rôle à mettre dans la variable GitHub AWS_ROLE_ARN (ce n'est pas un secret)"
   value       = aws_iam_role.github_deploy.arn
 }
+
+output "app_endpoint" {
+  description = "Adresse publique de l'application (à ouvrir en https://)"
+  value       = var.deploy_app ? aws_ecs_express_gateway_service.api[0].ingress_paths[0].endpoint : "(service non créé : deploy_app = false)"
+}
+
+output "ecs_cluster" {
+  description = "Nom du cluster ECS (variable GitHub ECS_CLUSTER)"
+  value       = aws_ecs_cluster.main.name
+}
