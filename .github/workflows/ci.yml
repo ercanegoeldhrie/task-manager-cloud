@@ -37,9 +37,9 @@ jobs:
           --health-retries 15
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -61,7 +61,7 @@ jobs:
     name: Construction de l'image Docker
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: docker build
         run: docker build -t task-manager:ci app
 
@@ -73,7 +73,7 @@ jobs:
       run:
         working-directory: infra
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: hashicorp/setup-terraform@v3
       - name: terraform fmt
         run: terraform fmt -check -recursive

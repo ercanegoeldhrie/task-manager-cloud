@@ -34,7 +34,7 @@ jobs:
       AWS_REGION: eu-west-3
       ECR_REPOSITORY: task-manager-api
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # avec workflow_run, on construit exactement le commit que la CI a testé
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
