@@ -10,6 +10,9 @@ resource "aws_iam_openid_connect_provider" "github" {
   client_id_list = ["sts.amazonaws.com"]
 }
 
+# Le numéro de ton compte AWS (lu automatiquement).
+data "aws_caller_identity" "current" {}
+
 # Le rôle que GitHub Actions va "endosser".
 resource "aws_iam_role" "github_deploy" {
   name = "${var.project}-github-deploy"
@@ -59,6 +62,13 @@ resource "aws_iam_role_policy" "github_deploy_ecr" {
           "ecr:UploadLayerPart",
         ]
         Resource = aws_ecr_repository.api.arn
+      },
+      {
+        # Étape 6 : relancer le service pour qu'il prenne la nouvelle image.
+        Sid      = "RedeployOurService"
+        Effect   = "Allow"
+        Action   = ["ecs:UpdateService", "ecs:DescribeServices"]
+        Resource = "arn:aws:ecs:${var.region}:${data.aws_caller_identity.current.account_id}:service/${var.project}/*"
       },
     ]
   })

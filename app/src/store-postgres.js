@@ -1,10 +1,11 @@
 // Stockage dans PostgreSQL : les tâches sont gardées sur disque, même après un redémarrage.
 // En local, la base tourne dans Docker. Dans le cloud, ce sera AWS RDS : le code ne changera pas,
-// seule l'adresse de connexion (DATABASE_URL) sera différente.
+// seule la configuration de connexion sera différente.
 const { Pool } = require('pg');
 
 // Un "pool" garde quelques connexions ouvertes et les réutilise (plus rapide qu'en ouvrir une
 // à chaque requête). DATABASE_URL ressemble à : postgres://utilisateur:motdepasse@hote:5432/base
+// Si DATABASE_URL est absente, la bibliothèque "pg" lit toute seule PGHOST, PGUSER, PGPASSWORD…
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   // Sur AWS RDS, la connexion est chiffrée (SSL). On l'activera avec DATABASE_SSL=true.

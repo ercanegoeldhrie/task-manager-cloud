@@ -23,6 +23,17 @@ resource "aws_security_group" "db" {
   vpc_id      = data.aws_vpc.default.id
 }
 
+# L'application (étape 6) tourne dans le même réseau privé (VPC) : on autorise ce réseau,
+# et lui seul, à parler à la base. La base reste invisible depuis Internet.
+resource "aws_vpc_security_group_ingress_rule" "db_from_vpc" {
+  security_group_id = aws_security_group.db.id
+  cidr_ipv4         = data.aws_vpc.default.cidr_block
+  from_port         = 5432
+  to_port           = 5432
+  ip_protocol       = "tcp"
+  description       = "PostgreSQL depuis le VPC (application)"
+}
+
 # Règle optionnelle : autoriser TON adresse IP (et elle seule) sur le port PostgreSQL 5432.
 # "count = 0" veut dire "ne pas créer" : la règle n'existe que si my_ip est rempli.
 resource "aws_vpc_security_group_ingress_rule" "db_from_my_ip" {

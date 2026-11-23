@@ -33,3 +33,13 @@ variable "github_repo" {
   type        = string
   default     = "ercanegoeldhrie/task-manager-cloud"
 }
+
+variable "deploy_app" {
+  description = <<-EOT
+    Créer le service qui met l'app en ligne (étape 6) ?
+    Mets true seulement APRÈS avoir envoyé une première image dans ECR.
+    ⚠️ Le service coûte ~0,055 $/heure tant qu'il existe.
+  EOT
+  type        = bool
+  default     = false
+}

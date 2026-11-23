@@ -17,7 +17,7 @@ Chaque étape ajoute **un seul nouveau concept**, avec une explication simple da
 | 3 | [Base PostgreSQL](docs/03-postgresql.md) ✅ (en local ; RDS créé à l'étape 4) | Base de données, Docker Compose, SQL | 0 € (local) |
 | 4 | [Toute l'infra avec Terraform (dont la base AWS RDS)](docs/04-terraform.md) ✅ | Infrastructure as Code, base managée, réseau (VPC) | Crédits gratuits ⚠️ |
 | 5 | [CI/CD avec GitHub Actions](docs/05-ci-cd.md) ✅ | Intégration et déploiement continus, OIDC | 0 € (minutes GitHub gratuites) |
-| 6 | Déployer sur AWS (App Runner ou ECS Fargate) | Hébergement de conteneurs, registre ECR | Crédits gratuits ⚠️ |
+| 6 | [Mettre l'app en ligne (ECS Express Mode)](docs/06-deploiement.md) ✅ | Conteneurs Fargate, répartiteur de charge, HTTPS, déploiement continu | Crédits gratuits ⚠️ (~1,80 $/jour tout allumé) |
 | 7 | Logs, secrets, HTTPS | CloudWatch, Secrets Manager, certificats | Crédits gratuits ⚠️ |
 
 ⚠️ = la ressource coûte de l'argent si elle reste allumée. Les nouveaux comptes AWS reçoivent des
@@ -27,13 +27,13 @@ crédits gratuits qui couvrent ce projet, mais **on détruira toujours l'infra a
 ## 🏗️ Architecture visée (à la fin)
 
 ```
-Navigateur ──HTTPS──▶ App Runner / Fargate (conteneur Docker de l'API)
+Navigateur ──HTTPS──▶ Répartiteur de charge ──▶ ECS Fargate (conteneur Docker de l'API)
                               │
                               ├──▶ RDS PostgreSQL (les tâches)
                               ├──▶ Secrets Manager (mot de passe de la base)
                               └──▶ CloudWatch (logs et alertes)
 
-GitHub ──push──▶ GitHub Actions ──(OIDC, sans clé)──▶ build Docker ▶ ECR ▶ déploiement
+GitHub ──merge──▶ GitHub Actions ──(OIDC, sans clé)──▶ build Docker ▶ ECR ▶ redéploiement ECS
 Terraform ──▶ crée et détruit toute l'infra AWS
 ```
 
@@ -77,7 +77,7 @@ app/
   src/server.js   démarrage du serveur
   public/         interface web (HTML, CSS, JavaScript)
   test/           tests automatiques
-infra/            code Terraform (base RDS, registre ECR, rôle OIDC)
+infra/            code Terraform (base RDS, registre ECR, rôle OIDC, service ECS)
 .github/workflows/  CI (tests) et CD (envoi de l'image vers AWS)
 docs/             explications de chaque étape
 docker-compose.yml  la base + l'API en local
