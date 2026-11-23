@@ -69,8 +69,8 @@ Points de sécurité à remarquer dans `main.tf` :
    terraform init
    terraform plan
    ```
-   Lis la sortie : `+` = sera créé. Tu dois voir **6 ressources à créer**
-   (« Plan: 6 to add »).
+   Lis la sortie : `+` = sera créé. Tu dois voir **5 ressources à créer**
+   (« Plan: 5 to add » ; 6 si tu as rempli `my_ip`).
 4. Crée l'infra (la base met **5 à 10 minutes** à démarrer) :
    ```bash
    terraform apply
