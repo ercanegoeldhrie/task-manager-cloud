@@ -1,0 +1,61 @@
+# CD = Déploiement Continu.
+# Quand du code arrive sur "main" ET que les tests passent, on construit l'image Docker
+# et on l'envoie dans le registre AWS ECR. À l'étape 6, ce même workflow déploiera l'app.
+#
+# Connexion à AWS SANS AUCUNE CLÉ grâce à OIDC :
+# GitHub fournit un "jeton d'identité" signé qui prouve « je suis le workflow du dépôt X,
+# sur la branche main ». AWS vérifie ce jeton et prête un rôle temporaire (1 heure).
+# Rien à voler : aucun secret n'est stocké dans GitHub.
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch: # bouton "Run workflow" pour le lancer à la main
+
+permissions:
+  contents: read
+  id-token: write # autorise le workflow à demander un jeton OIDC à GitHub
+
+jobs:
+  push-image:
+    name: Envoyer l'image vers ECR
+    runs-on: ubuntu-latest
+    # On ne déploie que si :
+    #  - la CI a réussi (ou lancement manuel),
+    #  - la variable AWS_ROLE_ARN est configurée (voir docs/05-ci-cd.md).
+    # Tant qu'AWS n'est pas prêt, ce job est simplement ignoré (pas d'erreur).
+    if: >-
+      vars.AWS_ROLE_ARN != '' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    env:
+      AWS_REGION: eu-west-3
+      ECR_REPOSITORY: task-manager-api
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # avec workflow_run, on construit exactement le commit que la CI a testé
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Se connecter à AWS (OIDC, sans clé)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Se connecter au registre ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Construire et envoyer l'image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          # Chaque image porte l'identifiant du commit : on sait toujours quel code tourne.
+          TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          docker build -t "$REGISTRY/$ECR_REPOSITORY:$TAG" -t "$REGISTRY/$ECR_REPOSITORY:latest" app
+          docker push "$REGISTRY/$ECR_REPOSITORY:$TAG"
+          docker push "$REGISTRY/$ECR_REPOSITORY:latest"
+          echo "Image envoyée : $REGISTRY/$ECR_REPOSITORY:$TAG" >> "$GITHUB_STEP_SUMMARY"

@@ -1,5 +1,7 @@
 # Task Manager Cloud ☁️
 
+[![CI](https://github.com/ercanegoeldhrie/task-manager-cloud/actions/workflows/ci.yml/badge.svg)](https://github.com/ercanegoeldhrie/task-manager-cloud/actions/workflows/ci.yml)
+
 Un gestionnaire de tâches construit **pas à pas** pour apprendre le cloud moderne sur **AWS** :
 API, conteneurs, base de données managée, infrastructure as code, CI/CD, monitoring et sécurité.
 
@@ -14,7 +16,7 @@ Chaque étape ajoute **un seul nouveau concept**, avec une explication simple da
 | 2 | [Conteneuriser avec Docker](docs/02-docker.md) ✅ | Image, conteneur, Dockerfile | 0 € (local) |
 | 3 | [Base PostgreSQL](docs/03-postgresql.md) ✅ (en local ; RDS créé à l'étape 4) | Base de données, Docker Compose, SQL | 0 € (local) |
 | 4 | [Toute l'infra avec Terraform (dont la base AWS RDS)](docs/04-terraform.md) ✅ | Infrastructure as Code, base managée, réseau (VPC) | Crédits gratuits ⚠️ |
-| 5 | CI/CD avec GitHub Actions | Intégration et déploiement continus, OIDC | 0 € (minutes GitHub gratuites) |
+| 5 | [CI/CD avec GitHub Actions](docs/05-ci-cd.md) ✅ | Intégration et déploiement continus, OIDC | 0 € (minutes GitHub gratuites) |
 | 6 | Déployer sur AWS (App Runner ou ECS Fargate) | Hébergement de conteneurs, registre ECR | Crédits gratuits ⚠️ |
 | 7 | Logs, secrets, HTTPS | CloudWatch, Secrets Manager, certificats | Crédits gratuits ⚠️ |
 
@@ -75,7 +77,8 @@ app/
   src/server.js   démarrage du serveur
   public/         interface web (HTML, CSS, JavaScript)
   test/           tests automatiques
-infra/            code Terraform (base RDS, registre ECR)
+infra/            code Terraform (base RDS, registre ECR, rôle OIDC)
+.github/workflows/  CI (tests) et CD (envoi de l'image vers AWS)
 docs/             explications de chaque étape
 docker-compose.yml  la base + l'API en local
 ```

@@ -1,0 +1,83 @@
+# CI = Intégration Continue.
+# À chaque push et à chaque pull request, GitHub lance ces vérifications sur ses propres machines.
+# Si une vérification échoue, la pull request affiche une croix rouge : on ne merge pas.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Principe du "moindre privilège" : ce workflow peut seulement LIRE le code.
+permissions:
+  contents: read
+
+jobs:
+  # 1. Les tests de l'API, en mémoire puis sur un vrai PostgreSQL.
+  test:
+    name: Tests de l'API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    # Un "service" est un conteneur lancé à côté du job : ici une base PostgreSQL jetable.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: taskuser
+          POSTGRES_PASSWORD: ci-password # base jetable, détruite à la fin du job
+          POSTGRES_DB: tasks
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U taskuser -d tasks"
+          --health-interval 2s
+          --health-retries 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Tests (stockage en mémoire)
+        run: npm test
+
+      - name: Tests (PostgreSQL)
+        run: npm test
+        env:
+          DATABASE_URL: postgres://taskuser:ci-password@localhost:5432/tasks
+
+  # 2. L'image Docker doit toujours pouvoir se construire.
+  docker:
+    name: Construction de l'image Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: docker build
+        run: docker build -t task-manager:ci app
+
+  # 3. Le code Terraform doit être bien formaté et valide.
+  terraform:
+    name: Vérification Terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: terraform fmt
+        run: terraform fmt -check -recursive
+      - name: terraform validate
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
