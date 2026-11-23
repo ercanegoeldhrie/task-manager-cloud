@@ -11,7 +11,7 @@ Chaque étape ajoute **un seul nouveau concept**, avec une explication simple da
 |---|-------|----------------|----------|
 | 0 | [Créer son compte AWS en sécurité](docs/00-compte-aws.md) | IAM, MFA, alerte de budget | 0 € |
 | 1 | [Petite API + interface web](docs/01-api-et-frontend.md) ✅ | API REST, HTTP, JSON, tests | 0 € (tout en local) |
-| 2 | Conteneuriser avec Docker | Image, conteneur, Dockerfile | 0 € (local) |
+| 2 | [Conteneuriser avec Docker](docs/02-docker.md) ✅ | Image, conteneur, Dockerfile | 0 € (local) |
 | 3 | Base PostgreSQL managée (AWS RDS) | Base de données managée, réseau (VPC) | Crédits gratuits ⚠️ |
 | 4 | Toute l'infra avec Terraform | Infrastructure as Code | 0 € (l'outil est gratuit) |
 | 5 | CI/CD avec GitHub Actions | Intégration et déploiement continus, OIDC | 0 € (minutes GitHub gratuites) |
@@ -48,10 +48,21 @@ npm start       # démarre l'API sur http://localhost:3000
 
 Ouvre ensuite http://localhost:3000 dans ton navigateur.
 
+## 🐳 Lancer le projet avec Docker (étape 2)
+
+```bash
+cd app
+docker build -t task-manager:local .
+docker run --rm -p 8080:3000 task-manager:local
+```
+
+Ouvre ensuite http://localhost:8080.
+
 ## 📁 Structure
 
 ```
 app/
+  Dockerfile      recette de l'image Docker
   src/app.js      routes de l'API
   src/store.js    stockage des tâches (mémoire, puis PostgreSQL à l'étape 3)
   src/server.js   démarrage du serveur
