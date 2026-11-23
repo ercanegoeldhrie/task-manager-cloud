@@ -1,0 +1,19 @@
+{
+  "name": "task-manager-api",
+  "version": "0.1.0",
+  "description": "Gestionnaire de tâches : projet d'apprentissage du cloud AWS",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.22.3"
+  }
+}

@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+# Terraform (étape 4) : ne jamais publier l'état ni les secrets
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
