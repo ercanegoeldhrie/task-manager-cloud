@@ -1,0 +1,7 @@
+# Fichiers qu'on n'envoie PAS dans l'image (plus légère, et pas de secrets par erreur)
+node_modules
+test
+.env
+*.log
+Dockerfile
+.dockerignore
