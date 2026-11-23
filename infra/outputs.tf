@@ -14,3 +14,8 @@ output "ecr_repository_url" {
   description = "Adresse du registre où envoyer l'image Docker"
   value       = aws_ecr_repository.api.repository_url
 }
+
+output "github_deploy_role_arn" {
+  description = "Rôle à mettre dans la variable GitHub AWS_ROLE_ARN (ce n'est pas un secret)"
+  value       = aws_iam_role.github_deploy.arn
+}

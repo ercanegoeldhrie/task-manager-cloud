@@ -27,3 +27,9 @@ variable "my_ip" {
   type        = string
   default     = ""
 }
+
+variable "github_repo" {
+  description = "Dépôt GitHub autorisé à déployer (propriétaire/nom)"
+  type        = string
+  default     = "ercanegoeldhrie/task-manager-cloud"
+}
