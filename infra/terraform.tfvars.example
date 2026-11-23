@@ -1,0 +1,5 @@
+# Copie ce fichier en "terraform.tfvars" pour changer les réglages.
+# terraform.tfvars est ignoré par Git (voir .gitignore) : il ne partira pas sur GitHub.
+
+# aws_profile = "tm"
+# my_ip       = ""   # ton IP publique (https://checkip.amazonaws.com) pour te connecter depuis ton PC

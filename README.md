@@ -13,7 +13,7 @@ Chaque étape ajoute **un seul nouveau concept**, avec une explication simple da
 | 1 | [Petite API + interface web](docs/01-api-et-frontend.md) ✅ | API REST, HTTP, JSON, tests | 0 € (tout en local) |
 | 2 | [Conteneuriser avec Docker](docs/02-docker.md) ✅ | Image, conteneur, Dockerfile | 0 € (local) |
 | 3 | [Base PostgreSQL](docs/03-postgresql.md) ✅ (en local ; RDS créé à l'étape 4) | Base de données, Docker Compose, SQL | 0 € (local) |
-| 4 | Toute l'infra avec Terraform (dont la base AWS RDS) | Infrastructure as Code, base managée, réseau (VPC) | Crédits gratuits ⚠️ |
+| 4 | [Toute l'infra avec Terraform (dont la base AWS RDS)](docs/04-terraform.md) ✅ | Infrastructure as Code, base managée, réseau (VPC) | Crédits gratuits ⚠️ |
 | 5 | CI/CD avec GitHub Actions | Intégration et déploiement continus, OIDC | 0 € (minutes GitHub gratuites) |
 | 6 | Déployer sur AWS (App Runner ou ECS Fargate) | Hébergement de conteneurs, registre ECR | Crédits gratuits ⚠️ |
 | 7 | Logs, secrets, HTTPS | CloudWatch, Secrets Manager, certificats | Crédits gratuits ⚠️ |
@@ -75,6 +75,7 @@ app/
   src/server.js   démarrage du serveur
   public/         interface web (HTML, CSS, JavaScript)
   test/           tests automatiques
+infra/            code Terraform (base RDS, registre ECR)
 docs/             explications de chaque étape
 docker-compose.yml  la base + l'API en local
 ```
