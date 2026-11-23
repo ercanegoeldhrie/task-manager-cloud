@@ -1,6 +1,6 @@
 // Tests automatiques de l'API, avec le lanceur de tests intégré à Node (node --test).
 // À l'étape 5, GitHub Actions lancera ces tests à chaque push.
-const { test, beforeEach, after } = require('node:test');
+const { test, before, beforeEach, after } = require('node:test');
 const assert = require('node:assert');
 const app = require('../src/app');
 const store = require('../src/store');
@@ -14,8 +14,13 @@ const call = (method, path, body) =>
     body: body ? JSON.stringify(body) : undefined,
   });
 
+// Les tests tournent sur la mémoire, ou sur PostgreSQL si DATABASE_URL est définie.
+before(() => store.init());
 beforeEach(() => store.reset());
-after(() => server.close());
+after(async () => {
+  server.close();
+  await store.close();
+});
 
 test('GET /health répond ok', async () => {
   const res = await call('GET', '/health');
@@ -41,6 +46,11 @@ test('marquer une tâche comme faite', async () => {
   const { id } = await (await call('POST', '/api/tasks', { title: 'Tâche' })).json();
   const res = await call('PATCH', `/api/tasks/${id}`, { done: true });
   assert.strictEqual((await res.json()).done, true);
+});
+
+test('modifier une tâche inexistante renvoie 404', async () => {
+  const res = await call('PATCH', '/api/tasks/999', { done: true });
+  assert.strictEqual(res.status, 404);
 });
 
 test('supprimer une tâche', async () => {

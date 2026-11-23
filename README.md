@@ -12,8 +12,8 @@ Chaque étape ajoute **un seul nouveau concept**, avec une explication simple da
 | 0 | [Créer son compte AWS en sécurité](docs/00-compte-aws.md) | IAM, MFA, alerte de budget | 0 € |
 | 1 | [Petite API + interface web](docs/01-api-et-frontend.md) ✅ | API REST, HTTP, JSON, tests | 0 € (tout en local) |
 | 2 | [Conteneuriser avec Docker](docs/02-docker.md) ✅ | Image, conteneur, Dockerfile | 0 € (local) |
-| 3 | Base PostgreSQL managée (AWS RDS) | Base de données managée, réseau (VPC) | Crédits gratuits ⚠️ |
-| 4 | Toute l'infra avec Terraform | Infrastructure as Code | 0 € (l'outil est gratuit) |
+| 3 | [Base PostgreSQL](docs/03-postgresql.md) ✅ (en local ; RDS créé à l'étape 4) | Base de données, Docker Compose, SQL | 0 € (local) |
+| 4 | Toute l'infra avec Terraform (dont la base AWS RDS) | Infrastructure as Code, base managée, réseau (VPC) | Crédits gratuits ⚠️ |
 | 5 | CI/CD avec GitHub Actions | Intégration et déploiement continus, OIDC | 0 € (minutes GitHub gratuites) |
 | 6 | Déployer sur AWS (App Runner ou ECS Fargate) | Hébergement de conteneurs, registre ECR | Crédits gratuits ⚠️ |
 | 7 | Logs, secrets, HTTPS | CloudWatch, Secrets Manager, certificats | Crédits gratuits ⚠️ |
@@ -58,15 +58,23 @@ docker run --rm -p 8080:3000 task-manager:local
 
 Ouvre ensuite http://localhost:8080.
 
+## 🐘 Lancer avec la base PostgreSQL (étape 3)
+
+```bash
+docker compose up --build     # la base + l'API, sur http://localhost:8080
+docker compose down           # tout arrêter (les tâches sont conservées)
+```
+
 ## 📁 Structure
 
 ```
 app/
   Dockerfile      recette de l'image Docker
   src/app.js      routes de l'API
-  src/store.js    stockage des tâches (mémoire, puis PostgreSQL à l'étape 3)
+  src/store*.js   stockage des tâches (PostgreSQL, ou mémoire sans DATABASE_URL)
   src/server.js   démarrage du serveur
   public/         interface web (HTML, CSS, JavaScript)
   test/           tests automatiques
 docs/             explications de chaque étape
+docker-compose.yml  la base + l'API en local
 ```
