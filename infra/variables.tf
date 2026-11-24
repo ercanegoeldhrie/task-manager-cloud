@@ -43,3 +43,18 @@ variable "deploy_app" {
   type        = bool
   default     = false
 }
+
+variable "alert_email" {
+  description = <<-EOT
+    Adresse e-mail qui reçoit les alertes (erreurs 500, lenteur, échec de démarrage).
+    Laisse vide ("") pour ne créer aucune alarme. Pense à confirmer l'abonnement reçu par e-mail.
+  EOT
+  type        = string
+  default     = ""
+}
+
+variable "log_retention_days" {
+  description = "Nombre de jours pendant lesquels CloudWatch garde les logs de l'app"
+  type        = number
+  default     = 7
+}
