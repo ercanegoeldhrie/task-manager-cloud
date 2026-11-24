@@ -99,6 +99,13 @@ resource "aws_ecs_express_gateway_service" "api" {
     image          = "${aws_ecr_repository.api.repository_url}:latest"
     container_port = 3000
 
+    # Étape 7 : les logs de l'app vont dans NOTRE groupe CloudWatch (observability.tf),
+    # celui qui a une durée de conservation, des filtres et des alarmes.
+    aws_logs_configuration = [{
+      log_group         = aws_cloudwatch_log_group.api.name
+      log_stream_prefix = "api"
+    }]
+
     # Configuration NON secrète : variables d'environnement classiques.
     environment {
       name  = "PORT"

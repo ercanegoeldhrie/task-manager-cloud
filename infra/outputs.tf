@@ -29,3 +29,13 @@ output "ecs_cluster" {
   description = "Nom du cluster ECS (variable GitHub ECS_CLUSTER)"
   value       = aws_ecs_cluster.main.name
 }
+
+output "log_group" {
+  description = "Groupe de logs CloudWatch de l'application"
+  value       = aws_cloudwatch_log_group.api.name
+}
+
+output "dashboard_url" {
+  description = "Tableau de bord CloudWatch"
+  value       = "https://${var.region}.console.aws.amazon.com/cloudwatch/home?region=${var.region}#dashboards/dashboard/${aws_cloudwatch_dashboard.main.dashboard_name}"
+}

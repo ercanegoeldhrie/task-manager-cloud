@@ -3,3 +3,7 @@
 
 # aws_profile = "tm"
 # my_ip       = ""   # ton IP publique (https://checkip.amazonaws.com) pour te connecter depuis ton PC
+
+# Étape 7 : recevoir les alertes par e-mail (confirmer l'abonnement reçu ensuite)
+# alert_email        = "toi@exemple.com"
+# log_retention_days = 7

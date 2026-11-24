@@ -3,8 +3,18 @@
 const path = require('path');
 const express = require('express');
 const store = require('./store');
+const logger = require('./logger');
+const { forceHttps, securityHeaders, requestLogger } = require('./middleware');
 
 const app = express();
+// En ligne, l'app est derrière UN répartiteur de charge : on fait confiance à ses en-têtes
+// X-Forwarded-* (protocole, IP du visiteur), et seulement à lui.
+app.set('trust proxy', 1);
+app.disable('x-powered-by'); // ne pas annoncer "Express" aux curieux
+
+app.use(requestLogger); // étape 7 : un log JSON par requête
+app.use(forceHttps); // étape 7 : HTTP → HTTPS
+app.use(securityHeaders); // étape 7 : en-têtes de sécurité
 app.use(express.json()); // lit le corps JSON des requêtes
 app.use(express.static(path.join(__dirname, '..', 'public'))); // sert l'interface web
 
@@ -44,7 +54,11 @@ app.delete('/api/tasks/:id', wrap(async (req, res) => {
 // Gestionnaire d'erreurs : on écrit le détail dans les logs (pour nous),
 // et on renvoie un message neutre au client (pour ne rien révéler de l'intérieur).
 app.use((err, req, res, next) => {
-  console.error(err);
+  // Un JSON mal formé envoyé par le client est SA faute : 400, pas 500.
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'JSON invalide' });
+  }
+  logger.error({ type: 'exception', method: req.method, path: req.originalUrl, error: err });
   res.status(500).json({ error: 'Erreur interne du serveur' });
 });
 
