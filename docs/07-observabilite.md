@@ -35,6 +35,7 @@ app (logs JSON) ──▶ CloudWatch Logs ──filtres──▶ métriques ─�
 | `app/src/app.js` | branche les middlewares ; un JSON mal formé renvoie 400 au lieu de 500 |
 | `app/src/server.js` | logs JSON au démarrage, arrêt propre quand ECS envoie `SIGTERM` |
 | `app/test/observability.test.js` | **nouveau** : 8 tests (logs, en-têtes, redirection) |
+| `app/package.json` | les fichiers de tests tournent l'un après l'autre : ils partagent la même base PostgreSQL |
 | `infra/observability.tf` | **nouveau** : groupe de logs, 4 métriques, 3 alarmes, e-mail, tableau de bord |
 | `infra/app.tf` | les logs de l'app vont dans notre groupe CloudWatch |
 | `infra/variables.tf` | `alert_email` et `log_retention_days` |
@@ -136,7 +137,7 @@ ne coûtent rien quand l'app est éteinte. Les logs sont effacés après 7 jours
 
 ## Ce qu'on a vérifié
 
-- Tests : 14 sur 14, dont 8 nouveaux (logs JSON, niveaux, `/health` ignoré, JSON mal formé → 400,
+- Tests : 14 sur 14 en mémoire et sur PostgreSQL, dont 8 nouveaux (logs JSON, niveaux, `/health` ignoré, JSON mal formé → 400,
   panne → 500 sans détail, en-têtes de sécurité, redirection HTTPS, HSTS).
 - L'interface web fonctionne avec la nouvelle `Content-Security-Policy` (aucune erreur dans le navigateur).
 - `terraform validate` et `fmt` passent avec le provider AWS 6.74.
